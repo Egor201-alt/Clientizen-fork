@@ -223,6 +223,16 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
             return new ElementTag(Minecraft.getInstance().gui.getChat().getScale());
         });
 
+        // <--[tag]
+        // @attribute <client.gui_scale>
+        // @returns ElementTag(Number)
+        // @description
+        // Returns the client's GUI scale (0 = Auto, 1 = Small, 2 = Normal, 3 = Large, etc).
+        // -->
+        tagProcessor.registerTag(ElementTag.class, "gui_scale", (attribute, object) -> {
+            return new ElementTag(Minecraft.getInstance().options.guiScale().get());
+        });
+
         // TODO this is temporary and is meant for testing only, should be replaced by a proper modifyblock command
         tagProcessor.registerMechanism("modifyblock", false, MaterialTag.class, (object, mechanism, input) -> {
             Minecraft client = Minecraft.getInstance();
