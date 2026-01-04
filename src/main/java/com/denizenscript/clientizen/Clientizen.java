@@ -1,6 +1,7 @@
 package com.denizenscript.clientizen;
 
 import com.denizenscript.clientizen.debuggui.ClientizenDebugScreen;
+import com.denizenscript.clientizen.events.ClientGuiScaleChangeScriptEvent;
 import com.denizenscript.clientizen.events.ClientizenScriptEventRegistry;
 import com.denizenscript.clientizen.network.NetworkManager;
 import com.denizenscript.clientizen.objects.ClientizenObjectRegistry;
@@ -49,6 +50,8 @@ public class Clientizen implements ClientModInitializer {
     public static String version;
 
     public DenizenImplementation coreImplementation = new DenizenCoreImpl();
+
+    public static int lastGuiScale = -1;
 
     @Override
     public void onInitializeClient() {
@@ -102,6 +105,24 @@ public class Clientizen implements ClientModInitializer {
 
         // Tick Denizen-Core
         ClientTickEvents.START_CLIENT_TICK.register(client -> DenizenCore.tick(50));
+
+        // Tick Gui_scale
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (client.options == null) return;
+            int currentScale = client.options.guiScale().get();
+
+            if (lastGuiScale == -1) {
+                lastGuiScale = currentScale;
+                return;
+            }
+
+            if (lastGuiScale != currentScale) {
+                if (ClientGuiScaleChangeScriptEvent.instance != null) {
+                    ClientGuiScaleChangeScriptEvent.instance.handleScaleChange(lastGuiScale, currentScale);
+                }
+                lastGuiScale = currentScale;
+            }
+        });
 
         // Shutdown Denizen-Core when the client is stopping
         // TODO: DenizenCore#shutdown saves files (e.g. flags) to disk, should not be done here
