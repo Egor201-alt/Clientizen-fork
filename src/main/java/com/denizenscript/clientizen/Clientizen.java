@@ -1,6 +1,7 @@
 package com.denizenscript.clientizen;
 
 import com.denizenscript.clientizen.debuggui.ClientizenDebugScreen;
+import com.denizenscript.clientizen.events.ClientCameraModeChangeScriptEvent;
 import com.denizenscript.clientizen.events.ClientGuiScaleChangeScriptEvent;
 import com.denizenscript.clientizen.events.ClientizenScriptEventRegistry;
 import com.denizenscript.clientizen.network.NetworkManager;
@@ -26,6 +27,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.CameraType;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +53,9 @@ public class Clientizen implements ClientModInitializer {
 
     public DenizenImplementation coreImplementation = new DenizenCoreImpl();
 
+    // Trackers for event triggers
     public static int lastGuiScale = -1;
+    public static CameraType lastCameraType = null;
 
     @Override
     public void onInitializeClient() {
@@ -106,21 +110,32 @@ public class Clientizen implements ClientModInitializer {
         // Tick Denizen-Core
         ClientTickEvents.START_CLIENT_TICK.register(client -> DenizenCore.tick(50));
 
-        // Tick Gui_scale
+        // Tick Clientizen triggers (GUI Scale, Camera Mode, etc.)
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.options == null) return;
-            int currentScale = client.options.guiScale().get();
 
+            // GUI Scale Trigger
+            int currentScale = client.options.guiScale().get();
             if (lastGuiScale == -1) {
                 lastGuiScale = currentScale;
-                return;
             }
-
-            if (lastGuiScale != currentScale) {
+            else if (lastGuiScale != currentScale) {
                 if (ClientGuiScaleChangeScriptEvent.instance != null) {
                     ClientGuiScaleChangeScriptEvent.instance.handleScaleChange(lastGuiScale, currentScale);
                 }
                 lastGuiScale = currentScale;
+            }
+
+            // Camera Mode Trigger
+            CameraType currentCamera = client.options.getCameraType();
+            if (lastCameraType == null) {
+                lastCameraType = currentCamera;
+            }
+            else if (lastCameraType != currentCamera) {
+                if (ClientCameraModeChangeScriptEvent.instance != null) {
+                    ClientCameraModeChangeScriptEvent.instance.handleCameraChange(lastCameraType, currentCamera);
+                }
+                lastCameraType = currentCamera;
             }
         });
 
