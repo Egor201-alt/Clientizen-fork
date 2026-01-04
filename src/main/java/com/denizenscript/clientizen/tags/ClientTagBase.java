@@ -249,6 +249,16 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
         tagProcessor.registerTag(ElementTag.class, "gui_scale", (attribute, object) -> {
             return new ElementTag(Minecraft.getInstance().options.guiScale().get());
         });
+        
+        // <--[tag]
+        // @attribute <client.is_focused>
+        // @returns ElementTag(Boolean)
+        // @description
+        // Returns true if the Minecraft window is currently focused (active), or false if minimized/background.
+        // -->
+        tagProcessor.registerTag(ElementTag.class, "is_focused", (attribute, object) -> {
+            return new ElementTag(Minecraft.getInstance().isWindowActive());
+        });
 
         // <--[tag]
         // @attribute <client.camera_mode>
