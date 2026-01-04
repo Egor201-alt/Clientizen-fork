@@ -7,6 +7,8 @@ import com.denizenscript.clientizen.objects.ModTag;
 import com.denizenscript.denizencore.DenizenCore;
 import com.denizenscript.denizencore.flags.AbstractFlagTracker;
 import com.denizenscript.denizencore.flags.FlaggableObject;
+import com.denizenscript.denizencore.objects.Adjustable;
+import com.denizenscript.denizencore.objects.Mechanism;
 import com.denizenscript.denizencore.objects.ObjectTag;
 import com.denizenscript.denizencore.objects.core.ElementTag;
 import com.denizenscript.denizencore.objects.core.ListTag;
@@ -16,13 +18,12 @@ import com.denizenscript.denizencore.scripts.commands.core.AdjustCommand;
 import com.denizenscript.denizencore.tags.PseudoObjectTagBase;
 import com.denizenscript.denizencore.tags.TagManager;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.client.Minecraft;   
-import net.minecraft.client.CameraType; 
 
-public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements FlaggableObject {
+public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements FlaggableObject, Adjustable {
 
     public static ClientTagBase instance;
     public static double climbingSpeed = 0.2; // 0.2 is the vanilla default
@@ -31,6 +32,16 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
         instance = this;
         TagManager.registerStaticTagBaseHandler(ClientTagBase.class, "client", t -> instance);
         AdjustCommand.specialAdjustables.put("client", mechanism -> tagProcessor.processMechanism(instance, mechanism));
+    }
+
+    @Override
+    public void adjust(Mechanism mechanism) {
+        tagProcessor.processMechanism(this, mechanism);
+    }
+
+    @Override
+    public String toString() {
+        return "client";
     }
 
     @Override
@@ -84,7 +95,6 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
         // @description
         // Returns the entity the client is currently looking at, if any.
         // -->
-        // TODO: do our own ray tracing to have full control
         tagProcessor.registerTag(EntityTag.class, "target", (attribute, object) -> {
             Entity target = Minecraft.getInstance().crosshairPickEntity;
             return target != null ? new EntityTag(target) : null;
@@ -234,7 +244,7 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
         tagProcessor.registerTag(ElementTag.class, "gui_scale", (attribute, object) -> {
             return new ElementTag(Minecraft.getInstance().options.guiScale().get());
         });
-        
+
         // <--[tag]
         // @attribute <client.camera_mode>
         // @returns ElementTag
@@ -245,7 +255,6 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
         tagProcessor.registerTag(ElementTag.class, "camera_mode", (attribute, object) -> {
             return new ElementTag(Minecraft.getInstance().options.getCameraType().name());
         });
-
 
         // <--[mechanism]
         // @object client
@@ -259,7 +268,7 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
         // -->
         tagProcessor.registerMechanism("camera_mode", false, ElementTag.class, (object, mechanism, input) -> {
             try {
-                net.minecraft.client.CameraType mode = net.minecraft.client.CameraType.valueOf(input.asString().toUpperCase());
+                CameraType mode = CameraType.valueOf(input.asString().toUpperCase());
                 Minecraft.getInstance().options.setCameraType(mode);
             } catch (IllegalArgumentException e) {
                 mechanism.echoError("Invalid camera mode specified: " + input.asString());
