@@ -40,6 +40,11 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
     }
 
     @Override
+    public void applyProperty(Mechanism mechanism) {
+        adjust(mechanism);
+    }
+
+    @Override
     public String toString() {
         return "client";
     }
