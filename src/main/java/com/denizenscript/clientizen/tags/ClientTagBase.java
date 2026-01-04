@@ -19,6 +19,8 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.client.Minecraft;   
+import net.minecraft.client.CameraType; 
 
 public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements FlaggableObject {
 
@@ -231,6 +233,37 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
         // -->
         tagProcessor.registerTag(ElementTag.class, "gui_scale", (attribute, object) -> {
             return new ElementTag(Minecraft.getInstance().options.guiScale().get());
+        });
+        
+        // <--[tag]
+        // @attribute <client.camera_mode>
+        // @returns ElementTag
+        // @description
+        // Returns the client's current camera perspective.
+        // Values: FIRST_PERSON, THIRD_PERSON_BACK, THIRD_PERSON_FRONT.
+        // -->
+        tagProcessor.registerTag(ElementTag.class, "camera_mode", (attribute, object) -> {
+            return new ElementTag(Minecraft.getInstance().options.getCameraType().name());
+        });
+
+
+        // <--[mechanism]
+        // @object client
+        // @name camera_mode
+        // @input ElementTag
+        // @description
+        // Sets the client's camera perspective.
+        // Input must be one of: FIRST_PERSON, THIRD_PERSON_BACK, THIRD_PERSON_FRONT.
+        // @tags
+        // <client.camera_mode>
+        // -->
+        tagProcessor.registerMechanism("camera_mode", false, ElementTag.class, (object, mechanism, input) -> {
+            try {
+                net.minecraft.client.CameraType mode = net.minecraft.client.CameraType.valueOf(input.asString().toUpperCase());
+                Minecraft.getInstance().options.setCameraType(mode);
+            } catch (IllegalArgumentException e) {
+                mechanism.echoError("Invalid camera mode specified: " + input.asString());
+            }
         });
 
         // TODO this is temporary and is meant for testing only, should be replaced by a proper modifyblock command
