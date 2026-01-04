@@ -3,6 +3,7 @@ package com.denizenscript.clientizen;
 import com.denizenscript.clientizen.debuggui.ClientizenDebugScreen;
 import com.denizenscript.clientizen.events.ClientCameraModeChangeScriptEvent;
 import com.denizenscript.clientizen.events.ClientGuiScaleChangeScriptEvent;
+import com.denizenscript.clientizen.events.ClientWindowFocusChangeScriptEvent;
 import com.denizenscript.clientizen.events.ClientizenScriptEventRegistry;
 import com.denizenscript.clientizen.network.NetworkManager;
 import com.denizenscript.clientizen.objects.ClientizenObjectRegistry;
