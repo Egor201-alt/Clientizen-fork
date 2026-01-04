@@ -56,6 +56,7 @@ public class Clientizen implements ClientModInitializer {
     // Trackers for event triggers
     public static int lastGuiScale = -1;
     public static CameraType lastCameraType = null;
+    public static Boolean lastFocused = null;
 
     @Override
     public void onInitializeClient() {
@@ -136,6 +137,19 @@ public class Clientizen implements ClientModInitializer {
                     ClientCameraModeChangeScriptEvent.instance.handleCameraChange(lastCameraType, currentCamera);
                 }
                 lastCameraType = currentCamera;
+            }
+            
+            // --- Window Focus Trigger ---
+            boolean currentFocused = client.isWindowActive();
+            
+            if (lastFocused == null) {
+                lastFocused = currentFocused;
+            }
+            else if (lastFocused != currentFocused) {
+                if (ClientWindowFocusChangeScriptEvent.instance != null) {
+                    ClientWindowFocusChangeScriptEvent.instance.handleFocusChange(currentFocused);
+                }
+                lastFocused = currentFocused;
             }
         });
 
