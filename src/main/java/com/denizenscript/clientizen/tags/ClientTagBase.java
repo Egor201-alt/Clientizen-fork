@@ -520,7 +520,7 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
         // Example return: "60".
         // -->
         tagProcessor.registerTag(ElementTag.class, "fps", (attribute, object) -> {
-            return new ElementTag(Minecraft.getInstance().getCurrentFps());
+            return new ElementTag(FpsMonitor.getCurrentGameFps());
         });
 
         // <--[tag]
@@ -532,7 +532,7 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
         // Example return: "12".
         // -->
         tagProcessor.registerTag(ElementTag.class, "min_fps", (attribute, object) -> {
-            int fps = FpsMonitor.minFps == Integer.MAX_VALUE ? Minecraft.getInstance().getCurrentFps() : FpsMonitor.minFps;
+            int fps = FpsMonitor.minFps == Integer.MAX_VALUE ? FpsMonitor.getCurrentGameFps() : FpsMonitor.minFps;
             return new ElementTag(fps);
         });
 
