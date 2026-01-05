@@ -22,6 +22,11 @@ import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.client.CloudStatus;
+import net.minecraft.client.GraphicsStatus;
+import net.minecraft.client.ParticleStatus;
+import net.minecraft.client.NarratorStatus;
 
 public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements FlaggableObject, Adjustable {
 
@@ -340,6 +345,103 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
         tagProcessor.registerMechanism("sensitivity", false, ElementTag.class, (object, mechanism, input) -> {
             if (mechanism.requireDouble()) {
                 Minecraft.getInstance().options.sensitivity().set(input.asDouble());
+            }
+        });
+
+        // <--[tag]
+        // @attribute <client.option[<name>]>
+        // @returns ElementTag
+        // @description
+        // Returns the value of a specific client option.
+        // Available options:
+        // - VIDEO: gamma, gui_scale, render_distance, particles, clouds, fullscreen, vsync
+        // - SOUND: sound_master, sound_music, sound_record, sound_weather, sound_block, sound_hostile, sound_neutral, sound_player, sound_ambient, sound_voice
+        // - GAME: auto_jump, narrator, main_hand
+        // -->
+        tagProcessor.registerTag(ElementTag.class, "option", (attribute, object) -> {
+            if (!attribute.hasParam()) return null;
+            String key = attribute.getParam().toLowerCase();
+            var opts = Minecraft.getInstance().options;
+
+            return switch (key) {
+                // Video
+                case "gamma" -> new ElementTag(opts.gamma().get());
+                case "gui_scale" -> new ElementTag(opts.guiScale().get());
+                case "render_distance" -> new ElementTag(opts.renderDistance().get());
+                case "fullscreen" -> new ElementTag(opts.fullscreen().get());
+                case "vsync" -> new ElementTag(opts.enableVsync().get());
+                case "particles" -> new ElementTag(opts.particles().get().toString()); // ALL, DECREASED, MINIMAL
+                case "clouds" -> new ElementTag(opts.cloudStatus().get().toString()); // OFF, FAST, FANCY
+                case "graphics" -> new ElementTag(opts.graphicsMode().get().toString()); // FAST, FANCY, FABULOUS
+
+                // Sound (0.0 to 1.0)
+                case "sound_master" -> new ElementTag(opts.getSoundSourceVolume(SoundSource.MASTER));
+                case "sound_music" -> new ElementTag(opts.getSoundSourceVolume(SoundSource.MUSIC));
+                case "sound_record" -> new ElementTag(opts.getSoundSourceVolume(SoundSource.RECORDS));
+                case "sound_weather" -> new ElementTag(opts.getSoundSourceVolume(SoundSource.WEATHER));
+                case "sound_block" -> new ElementTag(opts.getSoundSourceVolume(SoundSource.BLOCKS));
+                case "sound_hostile" -> new ElementTag(opts.getSoundSourceVolume(SoundSource.HOSTILE));
+                case "sound_neutral" -> new ElementTag(opts.getSoundSourceVolume(SoundSource.NEUTRAL));
+                case "sound_player" -> new ElementTag(opts.getSoundSourceVolume(SoundSource.PLAYERS));
+                case "sound_ambient" -> new ElementTag(opts.getSoundSourceVolume(SoundSource.AMBIENT));
+                case "sound_voice" -> new ElementTag(opts.getSoundSourceVolume(SoundSource.VOICE));
+
+                // Game
+                case "auto_jump" -> new ElementTag(opts.autoJump().get());
+                case "narrator" -> new ElementTag(opts.narrator().get().toString());
+                case "main_hand" -> new ElementTag(opts.mainHand().get().toString());
+
+                default -> null;
+            };
+        });
+
+        // <--[mechanism]
+        // @object client
+        // @name option
+        // @input MapTag
+        // @description
+        // Sets a generic client option.
+        // Input must be a map with 'name' and 'value'.
+        // Example: adjust <client> option:[name=sound_music;value=0.5]
+        // -->
+        tagProcessor.registerMechanism("option", false, MapTag.class, (object, mechanism, input) -> {
+            String name = input.getElement("name").asString().toLowerCase();
+            ElementTag value = input.getElement("value");
+            var opts = Minecraft.getInstance().options;
+
+            try {
+                switch (name) {
+                    // Video
+                    case "gamma" -> opts.gamma().set(value.asDouble());
+                    case "gui_scale" -> opts.guiScale().set(value.asInt());
+                    case "render_distance" -> opts.renderDistance().set(value.asInt());
+                    case "fullscreen" -> opts.fullscreen().set(value.asBoolean());
+                    case "vsync" -> opts.enableVsync().set(value.asBoolean());
+                    case "particles" -> opts.particles().set(ParticleStatus.valueOf(value.asString().toUpperCase()));
+                    case "clouds" -> opts.cloudStatus().set(CloudStatus.valueOf(value.asString().toUpperCase()));
+                    case "graphics" -> opts.graphicsMode().set(GraphicsStatus.valueOf(value.asString().toUpperCase()));
+
+                    // Sound
+                    case "sound_master" -> opts.setSoundCategoryVolume(SoundSource.MASTER, value.asFloat());
+                    case "sound_music" -> opts.setSoundCategoryVolume(SoundSource.MUSIC, value.asFloat());
+                    case "sound_record" -> opts.setSoundCategoryVolume(SoundSource.RECORDS, value.asFloat());
+                    case "sound_weather" -> opts.setSoundCategoryVolume(SoundSource.WEATHER, value.asFloat());
+                    case "sound_block" -> opts.setSoundCategoryVolume(SoundSource.BLOCKS, value.asFloat());
+                    case "sound_hostile" -> opts.setSoundCategoryVolume(SoundSource.HOSTILE, value.asFloat());
+                    case "sound_neutral" -> opts.setSoundCategoryVolume(SoundSource.NEUTRAL, value.asFloat());
+                    case "sound_player" -> opts.setSoundCategoryVolume(SoundSource.PLAYERS, value.asFloat());
+                    case "sound_ambient" -> opts.setSoundCategoryVolume(SoundSource.AMBIENT, value.asFloat());
+                    case "sound_voice" -> opts.setSoundCategoryVolume(SoundSource.VOICE, value.asFloat());
+
+                    // Game
+                    case "auto_jump" -> opts.autoJump().set(value.asBoolean());
+                    case "narrator" -> opts.narrator().set(NarratorStatus.valueOf(value.asString().toUpperCase()));
+                    case "main_hand" -> opts.mainHand().set(net.minecraft.world.entity.HumanoidArm.valueOf(value.asString().toUpperCase()));
+
+                    default -> mechanism.echoError("Unknown option: " + name);
+                }
+            } catch (Exception e) {
+                mechanism.echoError("Invalid value '" + value + "' for option '" + name + "'. Error: " + e.getMessage());
             }
         });
 
