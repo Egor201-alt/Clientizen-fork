@@ -35,15 +35,17 @@ public class ClientOptionChangeScriptEvent extends ScriptEvent {
 
     public ClientOptionChangeScriptEvent() {
         registerCouldMatcher("client option changes");
-        registerCouldMatcher("client option changes <option>");
+        registerCouldMatcher("client option changes <element>");
         instance = this;
     }
 
     @Override
     public boolean matches(ScriptPath path) {
         String arg = path.eventArgLowerAt(3);
-        if (!arg.isEmpty() && !runGenericCheck(arg, option)) {
-            return false;
+        if (!arg.isEmpty()) {
+            if (!runGenericCheck(arg, option)) {
+                return false;
+            }
         }
         return super.matches(path);
     }
