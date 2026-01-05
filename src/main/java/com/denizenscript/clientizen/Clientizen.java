@@ -4,6 +4,7 @@ import com.denizenscript.clientizen.debuggui.ClientizenDebugScreen;
 import com.denizenscript.clientizen.events.ClientCameraModeChangeScriptEvent;
 import com.denizenscript.clientizen.events.ClientGuiScaleChangeScriptEvent;
 import com.denizenscript.clientizen.events.ClientWindowFocusChangeScriptEvent;
+import com.denizenscript.clientizen.events.ClientOptionChangeScriptEvent;
 import com.denizenscript.clientizen.events.ClientizenScriptEventRegistry;
 import com.denizenscript.clientizen.network.NetworkManager;
 import com.denizenscript.clientizen.objects.ClientizenObjectRegistry;
@@ -58,6 +59,44 @@ public class Clientizen implements ClientModInitializer {
     public static int lastGuiScale = -1;
     public static CameraType lastCameraType = null;
     public static Boolean lastFocused = null;
+    public static Map<String, Object> lastOptionValues = new HashMap<>();
+
+    public static final List<String> WATCHED_OPTIONS = List.of(
+        "fov", "gamma", "sensitivity", "render_distance", "particles", "clouds", "graphics",
+        "sound_master", "sound_music", "sound_record", "sound_weather", "sound_block", 
+        "sound_hostile", "sound_neutral", "sound_player", "sound_ambient", "sound_voice",
+        "auto_jump", "main_hand", "narrator"
+    );
+
+    private static OptionInstance<Double> getSoundOption(SoundSource source) {
+        return Minecraft.getInstance().options.getSoundSourceOptionInstance(source);
+    }
+
+    private Object getCurrentOptionValue(String key) {
+        var opts = Minecraft.getInstance().options;
+        if (key.startsWith("sound_")) {
+            try {
+                String soundName = key.substring("sound_".length()).toUpperCase();
+                if (soundName.equals("RECORD")) soundName = "RECORDS";
+                if (soundName.equals("BLOCK")) soundName = "BLOCKS";
+                SoundSource source = SoundSource.valueOf(soundName);
+                return getSoundOption(source).get();
+            } catch (Exception ignored) {}
+        }
+        return switch (key) {
+            case "fov" -> opts.fov().get();
+            case "gamma" -> opts.gamma().get();
+            case "sensitivity" -> opts.sensitivity().get();
+            case "render_distance" -> opts.renderDistance().get();
+            case "particles" -> opts.particles().get().toString();
+            case "clouds" -> opts.cloudStatus().get().toString();
+            case "graphics" -> opts.graphicsMode().get().toString();
+            case "auto_jump" -> opts.autoJump().get();
+            case "main_hand" -> opts.mainHand().get().toString();
+            case "narrator" -> opts.narrator().get().toString();
+            default -> null;
+        };
+    }
 
     @Override
     public void onInitializeClient() {
@@ -112,7 +151,7 @@ public class Clientizen implements ClientModInitializer {
         // Tick Denizen-Core
         ClientTickEvents.START_CLIENT_TICK.register(client -> DenizenCore.tick(50));
 
-        // Tick Clientizen triggers (GUI Scale, Camera Mode, etc.)
+        // Tick Clientizen triggers
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.options == null) return;
 
@@ -140,7 +179,7 @@ public class Clientizen implements ClientModInitializer {
                 lastCameraType = currentCamera;
             }
             
-            // --- Window Focus Trigger ---
+            // --- Window Focus Trigger
             boolean currentFocused = client.isWindowActive();
             
             if (lastFocused == null) {
@@ -151,6 +190,23 @@ public class Clientizen implements ClientModInitializer {
                     ClientWindowFocusChangeScriptEvent.instance.handleFocusChange(currentFocused);
                 }
                 lastFocused = currentFocused;
+            }
+            // Generic Options Trigger
+            for (String key : WATCHED_OPTIONS) {
+                Object currentVal = getCurrentOptionValue(key);
+                if (currentVal == null) continue;
+
+                if (!lastOptionValues.containsKey(key)) {
+                    lastOptionValues.put(key, currentVal);
+                } else {
+                    Object oldVal = lastOptionValues.get(key);
+                    if (!currentVal.equals(oldVal)) {
+                        if (ClientOptionChangeScriptEvent.instance != null) {
+                            ClientOptionChangeScriptEvent.instance.handleHtmlChange(key, oldVal, currentVal);
+                        }
+                        lastOptionValues.put(key, currentVal);
+                    }
+                }
             }
         });
 
