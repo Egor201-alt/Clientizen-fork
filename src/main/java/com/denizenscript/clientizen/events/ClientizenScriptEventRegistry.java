@@ -32,6 +32,7 @@ public class ClientizenScriptEventRegistry {
         ScriptEvent.registerScriptEvent(ClientGuiScaleChangeScriptEvent.class);
         ScriptEvent.registerScriptEvent(ClientCameraModeChangeScriptEvent.class);
         ScriptEvent.registerScriptEvent(ClientWindowFocusChangeScriptEvent.class);
+        ScriptEvent.registerScriptEvent(ClientOptionChangeScriptEvent.class);
     }
 
     public static final Set<String> ENTITY_PLAINTEXT_MATCHERS = new HashSet<>(Arrays.asList(
