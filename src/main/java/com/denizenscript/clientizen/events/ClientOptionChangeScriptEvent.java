@@ -57,7 +57,7 @@ public class ClientOptionChangeScriptEvent extends ScriptEvent {
         };
     }
 
-    public void handleHtmlChange(String option, Object oldValue, Object newValue) {
+    public void handleOptionChange(String option, Object oldValue, Object newValue) {
         this.option = option;
         this.oldValue = oldValue;
         this.newValue = newValue;
