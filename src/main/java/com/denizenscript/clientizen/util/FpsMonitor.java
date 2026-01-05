@@ -1,6 +1,7 @@
 package com.denizenscript.clientizen.util;
 
 import net.minecraft.client.Minecraft;
+import java.lang.reflect.Field;
 
 public class FpsMonitor {
 
@@ -10,11 +11,38 @@ public class FpsMonitor {
     private static long totalFpsSum = 0;
     private static long samples = 0;
 
-    public static void update() {
-        Minecraft client = Minecraft.getInstance();
-        if (client == null) return;
+    // Поле для хранения доступа к приватной переменной fps
+    private static Field fpsField;
 
-        int current = client.fps;
+    static {
+        try {
+            try {
+                fpsField = Minecraft.class.getDeclaredField("fps");
+            } catch (NoSuchFieldException e) {
+                fpsField = Minecraft.class.getDeclaredField("field_1738");
+            }
+            fpsField.setAccessible(true);
+        } catch (Exception e) {
+            System.err.println("[Clientizen-Fork] Failed to access FPS field via reflection:");
+            e.printStackTrace();
+        }
+    }
+
+    public static int getCurrentGameFps() {
+        try {
+            if (fpsField != null) {
+                Minecraft client = Minecraft.getInstance();
+                if (client != null) {
+                    return fpsField.getInt(client);
+                }
+            }
+        } catch (Exception e) {
+        }
+        return 0;
+    }
+
+    public static void update() {
+        int current = getCurrentGameFps();
 
         if (current <= 0) return;
 
@@ -30,7 +58,7 @@ public class FpsMonitor {
     }
 
     public static int getAverage() {
-        if (samples == 0) return Minecraft.getInstance().fps;
+        if (samples == 0) return getCurrentGameFps();
         return (int) (totalFpsSum / samples);
     }
     
