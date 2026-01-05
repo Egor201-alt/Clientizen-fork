@@ -44,8 +44,11 @@ public class ClientOptionChangeScriptEvent extends ScriptEvent {
     @Override
     public boolean matches(ScriptPath path) {
         String arg = path.eventArgLowerAt(3);
-        if (!arg.isEmpty() && !new ElementTag(option).advancedMatches(arg)) {
-            return false;
+        if (!arg.isEmpty()) {
+            ElementTag optionTag = new ElementTag(option);
+            if (!optionTag.advancedMatches(arg)) {
+                return false;
+            }
         }
         return super.matches(path);
     }
