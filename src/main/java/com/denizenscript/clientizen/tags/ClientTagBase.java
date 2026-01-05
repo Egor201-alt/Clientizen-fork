@@ -290,6 +290,32 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
             }
         });
 
+        // <--[tag]
+        // @attribute <client.sensitivity>
+        // @returns ElementTag(Decimal)
+        // @description
+        // Returns the client's mouse sensitivity setting.
+        // -->
+        tagProcessor.registerTag(ElementTag.class, "sensitivity", (attribute, object) -> {
+            return new ElementTag(Minecraft.getInstance().options.sensitivity().get());
+        });
+
+        // <--[mechanism]
+        // @object client
+        // @name sensitivity
+        // @input ElementTag(Decimal)
+        // @description
+        // Sets the client's mouse sensitivity.
+        // Useful for "heavy" effects or sniper zooming.
+        // @tags
+        // <client.sensitivity>
+        // -->
+        tagProcessor.registerMechanism("sensitivity", false, ElementTag.class, (object, mechanism, input) -> {
+            if (mechanism.requireDouble()) {
+                Minecraft.getInstance().options.sensitivity().set(input.asDouble());
+            }
+        });
+
         // TODO this is temporary and is meant for testing only, should be replaced by a proper modifyblock command
         tagProcessor.registerMechanism("modifyblock", false, MaterialTag.class, (object, mechanism, input) -> {
             Minecraft client = Minecraft.getInstance();
