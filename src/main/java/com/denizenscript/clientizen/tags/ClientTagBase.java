@@ -20,14 +20,14 @@ import com.denizenscript.denizencore.tags.TagManager;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.client.ParticleStatus;
+import net.minecraft.client.option.ParticlesStatus; 
 import net.minecraft.client.CloudStatus;
 import net.minecraft.client.GraphicsStatus;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.client.NarratorStatus;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements FlaggableObject, Adjustable {
 
@@ -375,17 +375,17 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
                 case "clouds" -> new ElementTag(opts.cloudStatus().get().toString());
                 case "graphics" -> new ElementTag(opts.graphicsMode().get().toString());
 
-                // Sound (getSoundSourceOption for 1.21)
-                case "sound_master" -> new ElementTag(opts.getSoundSourceOption(SoundSource.MASTER).get());
-                case "sound_music" -> new ElementTag(opts.getSoundSourceOption(SoundSource.MUSIC).get());
-                case "sound_record" -> new ElementTag(opts.getSoundSourceOption(SoundSource.RECORDS).get());
-                case "sound_weather" -> new ElementTag(opts.getSoundSourceOption(SoundSource.WEATHER).get());
-                case "sound_block" -> new ElementTag(opts.getSoundSourceOption(SoundSource.BLOCKS).get());
-                case "sound_hostile" -> new ElementTag(opts.getSoundSourceOption(SoundSource.HOSTILE).get());
-                case "sound_neutral" -> new ElementTag(opts.getSoundSourceOption(SoundSource.NEUTRAL).get());
-                case "sound_player" -> new ElementTag(opts.getSoundSourceOption(SoundSource.PLAYERS).get());
-                case "sound_ambient" -> new ElementTag(opts.getSoundSourceOption(SoundSource.AMBIENT).get());
-                case "sound_voice" -> new ElementTag(opts.getSoundSourceOption(SoundSource.VOICE).get());
+                // Sound
+                case "sound_master" -> new ElementTag(opts.getSoundVolumeOption(SoundSource.MASTER).get());
+                case "sound_music" -> new ElementTag(opts.getSoundVolumeOption(SoundSource.MUSIC).get());
+                case "sound_record" -> new ElementTag(opts.getSoundVolumeOption(SoundSource.RECORDS).get());
+                case "sound_weather" -> new ElementTag(opts.getSoundVolumeOption(SoundSource.WEATHER).get());
+                case "sound_block" -> new ElementTag(opts.getSoundVolumeOption(SoundSource.BLOCKS).get());
+                case "sound_hostile" -> new ElementTag(opts.getSoundVolumeOption(SoundSource.HOSTILE).get());
+                case "sound_neutral" -> new ElementTag(opts.getSoundVolumeOption(SoundSource.NEUTRAL).get());
+                case "sound_player" -> new ElementTag(opts.getSoundVolumeOption(SoundSource.PLAYERS).get());
+                case "sound_ambient" -> new ElementTag(opts.getSoundVolumeOption(SoundSource.AMBIENT).get());
+                case "sound_voice" -> new ElementTag(opts.getSoundVolumeOption(SoundSource.VOICE).get());
 
                 // Game
                 case "auto_jump" -> new ElementTag(opts.autoJump().get());
@@ -395,6 +395,7 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
                 default -> null;
             };
         });
+
 
         // <--[mechanism]
         // @object client
@@ -418,21 +419,21 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
                     case "render_distance" -> opts.renderDistance().set(value.asInt());
                     case "fullscreen" -> opts.fullscreen().set(value.asBoolean());
                     case "vsync" -> opts.enableVsync().set(value.asBoolean());
-                    case "particles" -> opts.particles().set(ParticleStatus.valueOf(value.asString().toUpperCase()));
+                    case "particles" -> opts.particles().set(ParticlesStatus.valueOf(value.asString().toUpperCase()));
                     case "clouds" -> opts.cloudStatus().set(CloudStatus.valueOf(value.asString().toUpperCase()));
                     case "graphics" -> opts.graphicsMode().set(GraphicsStatus.valueOf(value.asString().toUpperCase()));
 
-                    // Sound (Fix for 1.21: use getSoundSourceOption().set())
-                    case "sound_master" -> opts.getSoundSourceOption(SoundSource.MASTER).set(value.asDouble());
-                    case "sound_music" -> opts.getSoundSourceOption(SoundSource.MUSIC).set(value.asDouble());
-                    case "sound_record" -> opts.getSoundSourceOption(SoundSource.RECORDS).set(value.asDouble());
-                    case "sound_weather" -> opts.getSoundSourceOption(SoundSource.WEATHER).set(value.asDouble());
-                    case "sound_block" -> opts.getSoundSourceOption(SoundSource.BLOCKS).set(value.asDouble());
-                    case "sound_hostile" -> opts.getSoundSourceOption(SoundSource.HOSTILE).set(value.asDouble());
-                    case "sound_neutral" -> opts.getSoundSourceOption(SoundSource.NEUTRAL).set(value.asDouble());
-                    case "sound_player" -> opts.getSoundSourceOption(SoundSource.PLAYERS).set(value.asDouble());
-                    case "sound_ambient" -> opts.getSoundSourceOption(SoundSource.AMBIENT).set(value.asDouble());
-                    case "sound_voice" -> opts.getSoundSourceOption(SoundSource.VOICE).set(value.asDouble());
+                    // Sound
+                    case "sound_master" -> opts.getSoundVolumeOption(SoundSource.MASTER).set(value.asDouble());
+                    case "sound_music" -> opts.getSoundVolumeOption(SoundSource.MUSIC).set(value.asDouble());
+                    case "sound_record" -> opts.getSoundVolumeOption(SoundSource.RECORDS).set(value.asDouble());
+                    case "sound_weather" -> opts.getSoundVolumeOption(SoundSource.WEATHER).set(value.asDouble());
+                    case "sound_block" -> opts.getSoundVolumeOption(SoundSource.BLOCKS).set(value.asDouble());
+                    case "sound_hostile" -> opts.getSoundVolumeOption(SoundSource.HOSTILE).set(value.asDouble());
+                    case "sound_neutral" -> opts.getSoundVolumeOption(SoundSource.NEUTRAL).set(value.asDouble());
+                    case "sound_player" -> opts.getSoundVolumeOption(SoundSource.PLAYERS).set(value.asDouble());
+                    case "sound_ambient" -> opts.getSoundVolumeOption(SoundSource.AMBIENT).set(value.asDouble());
+                    case "sound_voice" -> opts.getSoundVolumeOption(SoundSource.VOICE).set(value.asDouble());
 
                     // Game
                     case "auto_jump" -> opts.autoJump().set(value.asBoolean());
@@ -445,6 +446,7 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
                 mechanism.echoError("Invalid value '" + value + "' for option '" + name + "'. Error: " + e.getMessage());
             }
         });
+
 
         // TODO this is temporary and is meant for testing only, should be replaced by a proper modifyblock command
         tagProcessor.registerMechanism("modifyblock", false, MaterialTag.class, (object, mechanism, input) -> {
