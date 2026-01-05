@@ -24,6 +24,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.CloudStatus;
 import net.minecraft.client.GraphicsStatus;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.client.NarratorStatus;
 import net.minecraft.world.entity.Entity;
@@ -472,6 +473,42 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
             } catch (Exception e) {
                 mechanism.echoError("Invalid value '" + value + "' for option '" + name + "'. Error: " + e.getMessage());
             }
+        });
+
+        // <--[tag]
+        // @attribute <client.screen>
+        // @returns ElementTag
+        // @description
+        // Returns the type of the currently open screen (GUI) in a simplified format (class name without "Screen").
+        // Returns null if no GUI is open (player is in the game world).
+        // Example returns: Inventory, Pause (Esc menu), Chat, Advancements, CreativeModeInventory, Container.
+        // -->
+        tagProcessor.registerTag(ElementTag.class, "screen", (attribute, object) -> {
+            Screen currentScreen = Minecraft.getInstance().screen;
+            if (currentScreen == null) {
+                return null;
+            }
+            String className = currentScreen.getClass().getSimpleName();
+            if (className.endsWith("Screen")) {
+                className = className.substring(0, className.length() - "Screen".length());
+            }
+            return new ElementTag(className);
+        });
+        
+        // <--[tag]
+        // @attribute <client.screen_title>
+        // @returns ElementTag
+        // @description
+        // Returns the visible title of the currently open screen (GUI).
+        // Returns null if no GUI is open (player is in the game world).
+        // Example returns: "Crafting", "Chest", "Large Chest", "Furnace", "Advancements", "Creative Inventory".
+        // -->
+        tagProcessor.registerTag(ElementTag.class, "screen_title", (attribute, object) -> {
+            Screen currentScreen = Minecraft.getInstance().screen;
+            if (currentScreen == null) {
+                return null;
+            }
+            return new ElementTag(currentScreen.getTitle().getString());
         });
 
         // TODO this is temporary and is meant for testing only, should be replaced by a proper modifyblock command
