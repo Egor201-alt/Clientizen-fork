@@ -14,7 +14,7 @@ public class FpsMonitor {
         Minecraft client = Minecraft.getInstance();
         if (client == null) return;
 
-        int current = client.getCurrentFps();
+        int current = client.fps;
 
         if (current <= 0) return;
 
@@ -30,7 +30,7 @@ public class FpsMonitor {
     }
 
     public static int getAverage() {
-        if (samples == 0) return Minecraft.getInstance().getCurrentFps();
+        if (samples == 0) return Minecraft.getInstance().fps;
         return (int) (totalFpsSum / samples);
     }
     
