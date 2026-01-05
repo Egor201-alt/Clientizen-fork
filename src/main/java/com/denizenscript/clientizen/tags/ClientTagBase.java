@@ -511,6 +511,54 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
             return new ElementTag(currentScreen.getTitle().getString());
         });
 
+        // <--[tag]
+        // @attribute <client.fps>
+        // @returns ElementTag(Number)
+        // @description
+        // Returns the current FPS (Frames Per Second) of the client.
+        // Example return: "60".
+        // -->
+        tagProcessor.registerTag(ElementTag.class, "fps", (attribute, object) -> {
+            return new ElementTag(Minecraft.getInstance().getCurrentFps());
+        });
+
+        // <--[tag]
+        // @attribute <client.min_fps>
+        // @returns ElementTag(Number)
+        // @description
+        // Returns the lowest recorded FPS since the client started (or since stats were reset).
+        // This is calculated by the FpsMonitor roughly once per second.
+        // Example return: "12".
+        // -->
+        tagProcessor.registerTag(ElementTag.class, "min_fps", (attribute, object) -> {
+            int fps = FpsMonitor.minFps == Integer.MAX_VALUE ? Minecraft.getInstance().getCurrentFps() : FpsMonitor.minFps;
+            return new ElementTag(fps);
+        });
+
+        // <--[tag]
+        // @attribute <client.max_fps>
+        // @returns ElementTag(Number)
+        // @description
+        // Returns the highest recorded FPS since the client started (or since stats were reset).
+        // This is calculated by the FpsMonitor roughly once per second.
+        // Example return: "144".
+        // -->
+        tagProcessor.registerTag(ElementTag.class, "max_fps", (attribute, object) -> {
+            return new ElementTag(FpsMonitor.maxFps);
+        });
+
+        // <--[tag]
+        // @attribute <client.average_fps>
+        // @returns ElementTag(Number)
+        // @description
+        // Returns the average FPS calculated over the session duration.
+        // This is calculated by the FpsMonitor roughly once per second.
+        // Example return: "56".
+        // -->
+        tagProcessor.registerTag(ElementTag.class, "average_fps", (attribute, object) -> {
+            return new ElementTag(FpsMonitor.getAverage());
+        });
+
         // TODO this is temporary and is meant for testing only, should be replaced by a proper modifyblock command
         tagProcessor.registerMechanism("modifyblock", false, MaterialTag.class, (object, mechanism, input) -> {
             Minecraft client = Minecraft.getInstance();
