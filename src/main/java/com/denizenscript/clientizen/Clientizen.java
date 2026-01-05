@@ -1,5 +1,6 @@
 package com.denizenscript.clientizen;
 
+import net.minecraft.client.Minecraft;
 import com.denizenscript.clientizen.debuggui.ClientizenDebugScreen;
 import com.denizenscript.clientizen.events.ClientCameraModeChangeScriptEvent;
 import com.denizenscript.clientizen.events.ClientGuiScaleChangeScriptEvent;
@@ -30,11 +31,16 @@ import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.CameraType;
+import net.minecraft.client.OptionInstance;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
 
 public class Clientizen implements ClientModInitializer {
 
