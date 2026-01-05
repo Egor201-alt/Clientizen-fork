@@ -43,21 +43,6 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
         TagManager.registerStaticTagBaseHandler(ClientTagBase.class, "client", t -> instance);
         AdjustCommand.specialAdjustables.put("client", mechanism -> tagProcessor.processMechanism(instance, mechanism));
     }
-    // Reflection 
-    private OptionInstance<Double> getSoundOption(SoundSource source) {
-        try {
-            var opts = Minecraft.getInstance().options;
-            for (String methodName : Arrays.asList("getSoundSourceOption", "getSoundVolumeOption", "getSoundSource", "method_18413")) {
-                try {
-                    Method m = opts.getClass().getMethod(methodName, SoundSource.class);
-                    return (OptionInstance<Double>) m.invoke(opts, source);
-                } catch (NoSuchMethodException ignored) {}
-            }
-        } catch (Exception e) {
-            Debug.echoError("Error accessing sound option: " + e.getMessage());
-        }
-        return null;
-    }
 
     @Override
     public void adjust(Mechanism mechanism) {
@@ -383,17 +368,7 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
             String key = attribute.getParam().toLowerCase();
             var opts = Minecraft.getInstance().options;
 
-            if (key.startsWith("sound_")) {
-                try {
-                    String soundName = key.substring("sound_".length()).toUpperCase();
-                    if (soundName.equals("RECORD")) soundName = "RECORDS";
-                    if (soundName.equals("Block")) soundName = "BLOCKS"; // Fix typo check
-                    SoundSource source = SoundSource.valueOf(soundName);
-                    OptionInstance<Double> option = getSoundOption(source);
-                    if (option != null) return new ElementTag(option.get());
-                } catch (IllegalArgumentException ignored) { }
-            }
-
+            // ИСПРАВЛЕНО: Прямой доступ к полям для 1.21.10
             return switch (key) {
                 // Video
                 case "gamma" -> new ElementTag(opts.gamma().get());
@@ -404,7 +379,18 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
                 case "particles" -> new ElementTag(opts.particles().get().toString());
                 case "clouds" -> new ElementTag(opts.cloudStatus().get().toString());
                 case "graphics" -> new ElementTag(opts.graphicsMode().get().toString());
-                
+
+                case "sound_master" -> new ElementTag(opts.soundMaster.get());
+                case "sound_music" -> new ElementTag(opts.soundMusic.get());
+                case "sound_record" -> new ElementTag(opts.soundRecords.get()); 
+                case "sound_weather" -> new ElementTag(opts.soundWeather.get());
+                case "sound_block" -> new ElementTag(opts.soundBlocks.get());
+                case "sound_hostile" -> new ElementTag(opts.soundHostile.get());
+                case "sound_neutral" -> new ElementTag(opts.soundNeutral.get());
+                case "sound_player" -> new ElementTag(opts.soundPlayers.get());
+                case "sound_ambient" -> new ElementTag(opts.soundAmbient.get());
+                case "sound_voice" -> new ElementTag(opts.soundVoice.get());
+
                 // Game
                 case "auto_jump" -> new ElementTag(opts.autoJump().get());
                 case "narrator" -> new ElementTag(opts.narrator().get().toString());
@@ -429,21 +415,6 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
             ElementTag value = input.getElement("value");
             var opts = Minecraft.getInstance().options;
 
-            if (name.startsWith("sound_")) {
-                try {
-                    String soundName = name.substring("sound_".length()).toUpperCase();
-                    if (soundName.equals("RECORD")) soundName = "RECORDS";
-                    SoundSource source = SoundSource.valueOf(soundName);
-                    OptionInstance<Double> option = getSoundOption(source);
-                    if (option != null) {
-                        option.set(value.asDouble());
-                        return;
-                    }
-                } catch (Exception e) {
-                   mechanism.echoError("Error setting sound: " + e.getMessage());
-                }
-            }
-
             try {
                 switch (name) {
                     // Video
@@ -463,20 +434,28 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
                     case "clouds" -> opts.cloudStatus().set(CloudStatus.valueOf(value.asString().toUpperCase()));
                     case "graphics" -> opts.graphicsMode().set(GraphicsStatus.valueOf(value.asString().toUpperCase()));
 
+                    case "sound_master" -> opts.soundMaster.set(value.asDouble());
+                    case "sound_music" -> opts.soundMusic.set(value.asDouble());
+                    case "sound_record" -> opts.soundRecords.set(value.asDouble());
+                    case "sound_weather" -> opts.soundWeather.set(value.asDouble());
+                    case "sound_block" -> opts.soundBlocks.set(value.asDouble());
+                    case "sound_hostile" -> opts.soundHostile.set(value.asDouble());
+                    case "sound_neutral" -> opts.soundNeutral.set(value.asDouble());
+                    case "sound_player" -> opts.soundPlayers.set(value.asDouble());
+                    case "sound_ambient" -> opts.soundAmbient.set(value.asDouble());
+                    case "sound_voice" -> opts.soundVoice.set(value.asDouble());
+
                     // Game
                     case "auto_jump" -> opts.autoJump().set(value.asBoolean());
                     case "narrator" -> opts.narrator().set(NarratorStatus.valueOf(value.asString().toUpperCase()));
                     case "main_hand" -> opts.mainHand().set(HumanoidArm.valueOf(value.asString().toUpperCase()));
 
-                    default -> {
-                        if (!name.startsWith("sound_")) mechanism.echoError("Unknown option: " + name);
-                    }
+                    default -> mechanism.echoError("Unknown option: " + name);
                 }
             } catch (Exception e) {
                 mechanism.echoError("Invalid value '" + value + "' for option '" + name + "'. Error: " + e.getMessage());
             }
         });
-
 
         // TODO this is temporary and is meant for testing only, should be replaced by a proper modifyblock command
         tagProcessor.registerMechanism("modifyblock", false, MaterialTag.class, (object, mechanism, input) -> {
