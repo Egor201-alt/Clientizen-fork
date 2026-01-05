@@ -208,7 +208,7 @@ public class Clientizen implements ClientModInitializer {
                     Object oldVal = lastOptionValues.get(key);
                     if (!currentVal.equals(oldVal)) {
                         if (ClientOptionChangeScriptEvent.instance != null) {
-                            ClientOptionChangeScriptEvent.instance.handleHtmlChange(key, oldVal, currentVal);
+                            ClientOptionChangeScriptEvent.instance.handleOptionChange(key, oldVal, currentVal);
                         }
                         lastOptionValues.put(key, currentVal);
                     }
