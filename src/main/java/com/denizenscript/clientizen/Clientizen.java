@@ -17,6 +17,7 @@ import com.denizenscript.clientizen.tags.ClientizenTagContext;
 import com.denizenscript.clientizen.tags.ClientizenTagRegistry;
 import com.denizenscript.clientizen.util.ClientExecuteCommand;
 import com.denizenscript.clientizen.util.impl.DenizenCoreImpl;
+import com.denizenscript.clientizen.util.FpsMonitor;
 import com.denizenscript.denizencore.DenizenCore;
 import com.denizenscript.denizencore.DenizenImplementation;
 import com.denizenscript.denizencore.scripts.ScriptHelper;
@@ -66,6 +67,7 @@ public class Clientizen implements ClientModInitializer {
     public static CameraType lastCameraType = null;
     public static Boolean lastFocused = null;
     public static Map<String, Object> lastOptionValues = new HashMap<>();
+    public static int tickCounter = 0;
 
     public static final List<String> WATCHED_OPTIONS = List.of(
         "fov", "gamma", "sensitivity", "render_distance", "particles", "clouds", "graphics",
@@ -159,6 +161,11 @@ public class Clientizen implements ClientModInitializer {
 
         // Tick Clientizen triggers
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            
+            if (tickCounter++ % 20 == 0) {
+                FpsMonitor.update();
+            }
+            
             if (client.options == null) return;
 
             // GUI Scale Trigger
