@@ -4,6 +4,7 @@ import com.denizenscript.clientizen.objects.EntityTag;
 import com.denizenscript.clientizen.objects.LocationTag;
 import com.denizenscript.clientizen.objects.MaterialTag;
 import com.denizenscript.clientizen.objects.ModTag;
+import com.denizenscript.clientizen.util.FpsMonitor;
 import com.denizenscript.denizencore.DenizenCore;
 import com.denizenscript.denizencore.flags.AbstractFlagTracker;
 import com.denizenscript.denizencore.flags.FlaggableObject;
