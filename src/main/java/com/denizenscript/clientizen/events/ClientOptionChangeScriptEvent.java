@@ -40,25 +40,12 @@ public class ClientOptionChangeScriptEvent extends ScriptEvent {
         instance = this;
     }
 
-    @SuppressWarnings("deprecation")
-    @Override
-    public boolean matches(ScriptPath path) {
-        String arg = path.eventArgLowerAt(3);
-        if (!arg.isEmpty()) {
-            ElementTag optionTag = new ElementTag(option);
-            if (!optionTag.advancedMatches(arg)) {
-                return false;
-            }
-        }
-        return super.matches(path);
-    }
-
     @Override
     public ObjectTag getContext(String name) {
         return switch (name) {
             case "option" -> new ElementTag(option);
-            case "new_value" -> new ElementTag(String.valueOf(newValue));
-            case "old_value" -> new ElementTag(String.valueOf(oldValue));
+            case "new_value" -> new ElementTag(String.valueOf(newValue != null ? newValue : ""));
+            case "old_value" -> new ElementTag(String.valueOf(oldValue != null ? oldValue : ""));
             default -> super.getContext(name);
         };
     }
