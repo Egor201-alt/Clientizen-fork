@@ -17,10 +17,11 @@ import com.denizenscript.denizencore.objects.core.TimeTag;
 import com.denizenscript.denizencore.scripts.commands.core.AdjustCommand;
 import com.denizenscript.denizencore.tags.PseudoObjectTagBase;
 import com.denizenscript.denizencore.tags.TagManager;
+import com.denizenscript.denizencore.utilities.debugging.Debug;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.OptionInstance; // Важно для 1.21.10+
+import net.minecraft.client.OptionInstance;
 import net.minecraft.client.CloudStatus;
 import net.minecraft.client.GraphicsStatus;
 import net.minecraft.sounds.SoundSource;
@@ -53,7 +54,7 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
                 } catch (NoSuchMethodException ignored) {}
             }
         } catch (Exception e) {
-            DenizenCore.getImplementation().debugError("Error accessing sound option: " + e.getMessage());
+            Debug.echoError("Error accessing sound option: " + e.getMessage());
         }
         return null;
     }
