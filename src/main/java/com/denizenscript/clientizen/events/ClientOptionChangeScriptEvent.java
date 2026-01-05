@@ -40,6 +40,7 @@ public class ClientOptionChangeScriptEvent extends ScriptEvent {
         instance = this;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean matches(ScriptPath path) {
         String arg = path.eventArgLowerAt(3);
