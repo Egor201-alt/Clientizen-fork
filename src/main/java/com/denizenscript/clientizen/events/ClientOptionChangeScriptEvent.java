@@ -27,7 +27,7 @@ public class ClientOptionChangeScriptEvent extends ScriptEvent {
     // - narrate "Master volume changed to <context.new_value>!"
     // -->
 
-    public static ClientOptionChangeScriptEvent instance;
+public static ClientOptionChangeScriptEvent instance;
 
     public String option;
     public Object newValue;
@@ -35,18 +35,18 @@ public class ClientOptionChangeScriptEvent extends ScriptEvent {
 
     public ClientOptionChangeScriptEvent() {
         registerCouldMatcher("client option changes");
-        registerCouldMatcher("client option changes <element>");
+        registerCouldMatcher("client option changes *");
+        registerSwitches("option");
         instance = this;
     }
 
     @Override
     public boolean matches(ScriptPath path) {
         String arg = path.eventArgLowerAt(3);
-        if (!arg.isEmpty()) {
-            if (!runGenericCheck(arg, option)) {
-                return false;
-            }
+        if (!arg.isEmpty() && !CoreUtilities.runGenericCheck(arg, option)) {
+            return false;
         }
+
         return super.matches(path);
     }
 
@@ -60,10 +60,10 @@ public class ClientOptionChangeScriptEvent extends ScriptEvent {
         };
     }
 
-    public void handleHtmlChange(String option, Object oldValue, Object newValue) {
-        this.option = option;
-        this.oldValue = oldValue;
-        this.newValue = newValue;
+    public void handleOptionChange(String optionName, Object oldVal, Object newVal) {
+        this.option = optionName;
+        this.oldValue = oldVal;
+        this.newValue = newVal;
         fire();
     }
 }
