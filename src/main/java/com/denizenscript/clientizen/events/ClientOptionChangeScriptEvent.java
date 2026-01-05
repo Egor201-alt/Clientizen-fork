@@ -3,6 +3,7 @@ package com.denizenscript.clientizen.events;
 import com.denizenscript.denizencore.events.ScriptEvent;
 import com.denizenscript.denizencore.objects.ObjectTag;
 import com.denizenscript.denizencore.objects.core.ElementTag;
+import com.denizenscript.denizencore.utilities.CoreUtilities;
 
 public class ClientOptionChangeScriptEvent extends ScriptEvent {
 
