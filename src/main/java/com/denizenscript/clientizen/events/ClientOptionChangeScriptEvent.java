@@ -23,8 +23,8 @@ public class ClientOptionChangeScriptEvent extends ScriptEvent {
     //
     // @Example
     // # Track sound changes
-    // on client option changes option:sound_master:
-    // - debug log "Master volume changed to <context.new_value>!"
+    // on client option changes sound_master:
+    // - narrate "Master volume changed to <context.new_value>!"
     // -->
 
     public static ClientOptionChangeScriptEvent instance;
@@ -34,14 +34,15 @@ public class ClientOptionChangeScriptEvent extends ScriptEvent {
     public Object oldValue;
 
     public ClientOptionChangeScriptEvent() {
-        registerCouldMatcher("client option changes|change");
-        registerSwitches("option");
+        registerCouldMatcher("client option changes");
+        registerCouldMatcher("client option changes <option>");
         instance = this;
     }
 
     @Override
     public boolean matches(ScriptPath path) {
-        if (!runGenericSwitchCheck(path, "option", option)) {
+        String arg = path.eventArgLowerAt(3);
+        if (!arg.isEmpty() && !runGenericCheck(arg, option)) {
             return false;
         }
         return super.matches(path);
