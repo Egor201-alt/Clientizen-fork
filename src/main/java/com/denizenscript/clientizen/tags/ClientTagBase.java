@@ -249,6 +249,17 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
         tagProcessor.registerTag(ElementTag.class, "gui_scale", (attribute, object) -> {
             return new ElementTag(Minecraft.getInstance().options.guiScale().get());
         });
+
+        // <--[tag]
+        // @attribute <client.real_gui_scale>
+        // @returns ElementTag(Number)
+        // @description
+        // Returns the ACTUAL calculated GUI scale factor currently being used.
+        // Even if the setting is "Auto" (0), this will return the real number (e.g. 3, 4).
+        // -->
+        tagProcessor.registerTag(ElementTag.class, "real_gui_scale", (attribute, object) -> {
+            return new ElementTag(Minecraft.getInstance().getWindow().getGuiScale());
+        });
         
         // <--[tag]
         // @attribute <client.is_focused>
