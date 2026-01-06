@@ -4,13 +4,13 @@ import com.denizenscript.clientizen.objects.EntityTag;
 import com.denizenscript.clientizen.objects.LocationTag;
 import com.denizenscript.clientizen.tags.ClientTagBase;
 import com.denizenscript.denizencore.objects.core.ListTag;
-import com.denizenscript.denizencore.tags.TagManager;
+import com.denizenscript.denizencore.tags.ObjectTagProcessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 
 public class ClientEntityTags {
 
-    public static void register(TagManager.TagProcessor<ClientTagBase> tagProcessor) {
+    public static void register(ObjectTagProcessor<ClientTagBase> tagProcessor) {
       
         // <--[tag]
         // @attribute <client.loaded_entities[(<matcher>)]>
