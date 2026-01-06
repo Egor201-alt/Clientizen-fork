@@ -7,11 +7,11 @@ import com.denizenscript.denizencore.objects.core.ElementTag;
 import com.denizenscript.denizencore.objects.core.ListTag;
 import com.denizenscript.denizencore.objects.core.MapTag;
 import com.denizenscript.denizencore.objects.core.TimeTag;
-import com.denizenscript.denizencore.tags.TagManager;
+import com.denizenscript.denizencore.tags.ObjectTagProcessor;
 
 public class ClientFlagTags {
 
-    public static void register(TagManager.TagProcessor<ClientTagBase> tagProcessor) {
+    public static void register(ObjectTagProcessor<ClientTagBase> tagProcessor) {
         
         // <--[tag]
         // @attribute <client.has_flag[<flag>]>
