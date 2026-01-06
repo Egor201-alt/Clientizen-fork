@@ -1,6 +1,6 @@
 package com.denizenscript.clientizen.mixin;
 
-import com.denizenscript.clientizen.tags.ClientTagBase;
+import com.denizenscript.clientizen.tags.modules.ClientWorldTags;
 import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -15,6 +15,6 @@ public abstract class LivingEntityMixin {
 
     @ModifyArg(method = "handleRelativeFrictionAndCalculateMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/Vec3;<init>(DDD)V"), index = 1)
     private double clientizen$modifyClimbingSpeed(double y) {
-        return onClimbable() ? ClientTagBase.climbingSpeed : y;
+        return onClimbable() ? ClientWorldTags.climbingSpeed : y;
     }
 }
