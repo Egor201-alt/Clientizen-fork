@@ -22,7 +22,6 @@ public class ClientTagBase extends PseudoObjectTagBase<ClientTagBase> implements
 
     @Override
     public void register() {
-        // Register all tag-modules
         ClientEntityTags.register(tagProcessor);
         ClientWorldTags.register(tagProcessor);
         ClientGuiTags.register(tagProcessor);
