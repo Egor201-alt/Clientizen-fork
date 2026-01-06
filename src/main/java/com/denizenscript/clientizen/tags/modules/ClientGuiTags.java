@@ -2,13 +2,13 @@ package com.denizenscript.clientizen.tags.modules;
 
 import com.denizenscript.clientizen.tags.ClientTagBase;
 import com.denizenscript.denizencore.objects.core.ElementTag;
-import com.denizenscript.denizencore.tags.TagManager;
+import com.denizenscript.denizencore.tags.ObjectTagProcessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 
 public class ClientGuiTags {
 
-    public static void register(TagManager.TagProcessor<ClientTagBase> tagProcessor) {
+    public static void register(ObjectTagProcessor<ClientTagBase> tagProcessor) {
         
         // <--[tag]
         // @attribute <client.chat_width>
