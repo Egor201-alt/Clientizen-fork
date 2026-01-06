@@ -3,7 +3,7 @@ package com.denizenscript.clientizen.tags.modules;
 import com.denizenscript.clientizen.tags.ClientTagBase;
 import com.denizenscript.denizencore.objects.core.ElementTag;
 import com.denizenscript.denizencore.objects.core.MapTag;
-import com.denizenscript.denizencore.tags.TagManager;
+import com.denizenscript.denizencore.tags.ObjectTagProcessor;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.CloudStatus;
 import net.minecraft.client.GraphicsStatus;
@@ -19,7 +19,7 @@ public class ClientSettingsTags {
         return Minecraft.getInstance().options.getSoundSourceOptionInstance(source);
     }
 
-    public static void register(TagManager.TagProcessor<ClientTagBase> tagProcessor) {
+    public static void register(ObjectTagProcessor<ClientTagBase> tagProcessor) {
 
         // <--[tag]
         // @attribute <client.camera_mode>
