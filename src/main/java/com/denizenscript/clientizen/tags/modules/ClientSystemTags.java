@@ -5,13 +5,13 @@ import com.denizenscript.clientizen.tags.ClientTagBase;
 import com.denizenscript.clientizen.util.FpsMonitor;
 import com.denizenscript.denizencore.objects.core.ElementTag;
 import com.denizenscript.denizencore.objects.core.ListTag;
-import com.denizenscript.denizencore.tags.TagManager;
+import com.denizenscript.denizencore.tags.ObjectTagProcessor;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 
 public class ClientSystemTags {
 
-    public static void register(TagManager.TagProcessor<ClientTagBase> tagProcessor) {
+    public static void register(ObjectTagProcessor<ClientTagBase> tagProcessor) {
 
         // <--[tag]
         // @attribute <client.mods>
