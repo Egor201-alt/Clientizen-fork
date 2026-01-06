@@ -4,7 +4,7 @@ import com.denizenscript.clientizen.objects.LocationTag;
 import com.denizenscript.clientizen.objects.MaterialTag;
 import com.denizenscript.clientizen.tags.ClientTagBase;
 import com.denizenscript.denizencore.objects.core.ElementTag;
-import com.denizenscript.denizencore.tags.TagManager;
+import com.denizenscript.denizencore.tags.ObjectTagProcessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.phys.BlockHitResult;
 
@@ -12,7 +12,7 @@ public class ClientWorldTags {
 
     public static double climbingSpeed = 0.2; // 0.2 is the vanilla default
 
-    public static void register(TagManager.TagProcessor<ClientTagBase> tagProcessor) {
+    public static void register(ObjectTagProcessor<ClientTagBase> tagProcessor) {
         
         // <--[tag]
         // @attribute <client.cursor_on>
