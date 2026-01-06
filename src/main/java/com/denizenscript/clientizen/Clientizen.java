@@ -80,30 +80,14 @@ public class Clientizen implements ClientModInitializer {
         return Minecraft.getInstance().options.getSoundSourceOptionInstance(source);
     }
 
-    private Object getCurrentOptionValue(String key) {
-        var opts = Minecraft.getInstance().options;
-        if (key.startsWith("sound_")) {
-            try {
-                String soundName = key.substring("sound_".length()).toUpperCase();
-                if (soundName.equals("RECORD")) soundName = "RECORDS";
-                if (soundName.equals("BLOCK")) soundName = "BLOCKS";
-                SoundSource source = SoundSource.valueOf(soundName);
-                return getSoundOption(source).get();
-            } catch (Exception ignored) {}
-        }
-        return switch (key) {
-            case "fov" -> opts.fov().get();
-            case "gamma" -> opts.gamma().get();
-            case "sensitivity" -> opts.sensitivity().get();
-            case "render_distance" -> opts.renderDistance().get();
-            case "particles" -> opts.particles().get().toString();
-            case "clouds" -> opts.cloudStatus().get().toString();
-            case "graphics" -> opts.graphicsMode().get().toString();
-            case "auto_jump" -> opts.autoJump().get();
-            case "main_hand" -> opts.mainHand().get().toString();
-            case "narrator" -> opts.narrator().get().toString();
-            default -> null;
-        };
+    private static final Map<String, Supplier<Object>> OPTION_PROVIDERS = new HashMap<>();
+
+    private static void registerOption(String name, Supplier<Object> supplier) {
+        OPTION_PROVIDERS.put(name, supplier);
+    }
+
+    private static void registerSoundOption(String name, SoundSource source) {
+        OPTION_PROVIDERS.put(name, () -> Minecraft.getInstance().options.getSoundSourceOptionInstance(source).get());
     }
 
     @Override
@@ -119,6 +103,28 @@ public class Clientizen implements ClientModInitializer {
         CoreUtilities.errorButNoDebugContext = new ClientizenTagContext(false, null, null);
         DenizenCore.init(coreImplementation);
         DenizenCore.reloadSaves();
+
+        registerOption("fov", () -> Minecraft.getInstance().options.fov().get());
+        registerOption("gamma", () -> Minecraft.getInstance().options.gamma().get());
+        registerOption("sensitivity", () -> Minecraft.getInstance().options.sensitivity().get());
+        registerOption("render_distance", () -> Minecraft.getInstance().options.renderDistance().get());
+        registerOption("particles", () -> Minecraft.getInstance().options.particles().get().toString());
+        registerOption("clouds", () -> Minecraft.getInstance().options.cloudStatus().get().toString());
+        registerOption("graphics", () -> Minecraft.getInstance().options.graphicsMode().get().toString());
+        registerOption("auto_jump", () -> Minecraft.getInstance().options.autoJump().get());
+        registerOption("main_hand", () -> Minecraft.getInstance().options.mainHand().get().toString());
+        registerOption("narrator", () -> Minecraft.getInstance().options.narrator().get().toString());
+
+        registerSoundOption("sound_master", SoundSource.MASTER);
+        registerSoundOption("sound_music", SoundSource.MUSIC);
+        registerSoundOption("sound_record", SoundSource.RECORDS);
+        registerSoundOption("sound_weather", SoundSource.WEATHER);
+        registerSoundOption("sound_block", SoundSource.BLOCKS);
+        registerSoundOption("sound_hostile", SoundSource.HOSTILE);
+        registerSoundOption("sound_neutral", SoundSource.NEUTRAL);
+        registerSoundOption("sound_player", SoundSource.PLAYERS);
+        registerSoundOption("sound_ambient", SoundSource.AMBIENT);
+        registerSoundOption("sound_voice", SoundSource.VOICE);
 
         // Configure Denizen-Core
         CoreConfiguration.allowConsoleRedirection = false;
@@ -164,6 +170,7 @@ public class Clientizen implements ClientModInitializer {
             
             if (tickCounter++ % 20 == 0) {
                 FpsMonitor.update();
+                if (tickCounter > 10000) tickCounter = 0;
             }
             
             if (client.options == null) return;
@@ -205,8 +212,10 @@ public class Clientizen implements ClientModInitializer {
                 lastFocused = currentFocused;
             }
             // Generic Options Trigger
-            for (String key : WATCHED_OPTIONS) {
-                Object currentVal = getCurrentOptionValue(key);
+            for (Map.Entry<String, Supplier<Object>> entry : OPTION_PROVIDERS.entrySet()) {
+                String key = entry.getKey();
+                Object currentVal = entry.getValue().get();
+                
                 if (currentVal == null) continue;
 
                 if (!lastOptionValues.containsKey(key)) {
@@ -222,7 +231,6 @@ public class Clientizen implements ClientModInitializer {
                 }
             }
         });
-
         // Shutdown Denizen-Core when the client is stopping
         // TODO: DenizenCore#shutdown saves files (e.g. flags) to disk, should not be done here
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> DenizenCore.shutdown());
