@@ -2,9 +2,9 @@ name: Build Clientizen
 
 on:
   push:
-    branches: [ "stable-1.21.10" ]
+    branches: [ "stable-1.21.10", "updated-1.21.10" ]
   pull_request:
-    branches: [ "stable-1.21.10" ]
+    branches: [ "stable-1.21.10", "updated-1.21.10" ]
   workflow_dispatch:
 
 jobs:
